@@ -48,7 +48,7 @@ public class Cube : MonoBehaviour
     Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
     RaycastHit hit;
     bool isObjectClicked = Physics.Raycast(ray, out hit);
-    if (!isObjectClicked || !hit.transform.name.StartsWith("cell "))
+    if (!isObjectClicked || !hit.transform.name.StartsWith("Cell "))
     {
         return;
     }
