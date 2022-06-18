@@ -312,7 +312,7 @@ GameObject:
   - component: {fileID: 1880901364}
   - component: {fileID: 1880901363}
   m_Layer: 0
-  m_Name: cube
+  m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -327,11 +327,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1880901362}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bed9ee55acc82ec589f8a1c96837b6c3, type: 3}
+  m_Script: {fileID: 11500000, guid: cd6a7fab16f494bef964a9963f50346e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cellSize: 1
-  cellMargin: 0.3
   cellPrefab: {fileID: 3253670331344368621, guid: 7dbabafb4f550e86eb61f5473e41b14a,
     type: 3}
   gameState: {fileID: 11400000, guid: ce21a52aa90b85b709be741ba54b83fa, type: 2}
