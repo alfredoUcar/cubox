@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Threading;
 using Unity.VisualScripting;
+using Unity.VisualScripting.Dependencies.NCalc;
 using UnityEngine;
 
 public class Cube : MonoBehaviour
@@ -39,7 +41,7 @@ public class Cube : MonoBehaviour
 
   private void CheckClickOnCell()
   {
-    bool isLeftButtonPressed = Input.GetMouseButtonDown(0);
+    bool isLeftButtonPressed = Input.GetMouseButtonDown((int)MouseButton.Left);
     if (!isLeftButtonPressed)
     {
         return;
@@ -48,12 +50,19 @@ public class Cube : MonoBehaviour
     Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
     RaycastHit hit;
     bool isObjectClicked = Physics.Raycast(ray, out hit);
-    if (!isObjectClicked || !hit.transform.name.StartsWith("Cell "))
+    if (!isObjectClicked)
     {
         return;
     }
 
-    hit.transform.GetComponent<Renderer>().material.color = gameState.getCurrentColor();
+    // Get transform component through the cell collider because first transform
+    // detected by the raycast would belong to parent container.
+    if (!hit.collider.transform.name.StartsWith("Cell "))
+    {
+      return;
+    }
+
+    hit.collider.transform.GetComponent<Renderer>().material.color = gameState.getCurrentColor();
     gameState.endTurn();
     
   }
@@ -61,5 +70,33 @@ public class Cube : MonoBehaviour
   void Update()
     {
         CheckClickOnCell();   
+        HandleWholeCubeRotation();
     }
+  
+  private void HandleWholeCubeRotation()
+  {
+
+    Vector3 rotationToAdd = new Vector3(0, 0, 0);
+
+    if (Input.GetKeyDown(KeyCode.LeftArrow))
+    {
+      rotationToAdd = new Vector3(-90, 0, 0);
+    } 
+    else if (Input.GetKeyDown(KeyCode.RightArrow))
+    {
+      rotationToAdd = new Vector3(90, 0, 0);
+    }
+    else if (Input.GetKeyDown(KeyCode.UpArrow))
+    {
+      rotationToAdd = new Vector3(0, 90, 0);
+    }
+    else if (Input.GetKeyDown(KeyCode.DownArrow))
+    {
+      rotationToAdd = new Vector3(0, -90, 0);
+    }
+
+    Rigidbody rigidBody = gameObject.GetComponent<Rigidbody>();
+    Quaternion deltaRotation = Quaternion.Euler(rotationToAdd);
+    rigidBody.MoveRotation(rigidBody.rotation * deltaRotation);
+  }
 }
