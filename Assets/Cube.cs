@@ -3,34 +3,50 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Threading;
+using System.Xml;
 using Unity.VisualScripting;
 using Unity.VisualScripting.Dependencies.NCalc;
 using UnityEngine;
+using UnityEngine.Assertions.Must;
 
 public class Cube : MonoBehaviour
 {
-    public GameObject cellPrefab;
-    public GameState gameState;
-    private GameObject[,,] cells = new GameObject[3,3,3];
+  private const int CUBE_SIZE = 11;
+  private const float RELATIVE_CELL_SIZE = 3f;
+  private const float RELATIVE_CELL_MARGIN = 1f;
+  private const float CELL_SIZE = RELATIVE_CELL_SIZE / CUBE_SIZE;
+  private const float ROTATION_TIME_SECONDS = 1.5f;
+  public GameObject cellPrefab;
+  public GameState gameState;
+  private GameObject[,,] cells = new GameObject[3,3,3];
 
   void Start()
   {
+    InitializeCube();
     CreateCells();
+  }
+
+  private void InitializeCube()
+  {
+    gameObject.transform.localScale = Vector3.one * CUBE_SIZE;
+    gameObject.transform.position = new Vector3(0, 0, 0);
   }
 
   public void CreateCells()
   {
-    for (int x = 0; x < GameState.dimensions; x++)
+    float relativePosition = RELATIVE_CELL_SIZE + RELATIVE_CELL_MARGIN;
+    for (int x = -1; x < GameState.dimensions - 1; x++)
     {
-      for (int y = 0; y < GameState.dimensions; y++)
+      for (int y = -1; y < GameState.dimensions - 1; y++)
       {
-        for (int z = 0; z < GameState.dimensions; z++)
+        for (int z = -1; z < GameState.dimensions -1; z++)
         {
-          Vector3 position = new Vector3(x + x * gameState.cellMargin, y + y * gameState.cellMargin, z + z * gameState.cellMargin);
-          GameObject cell = Instantiate(cellPrefab, position, Quaternion.identity) as GameObject;
-          cell.name = $"Cell {x}-{y}-{z}";
-          cell.transform.SetParent(this.gameObject.transform);
-          cells[x, y, z] = cell; 
+          Vector3 position = new Vector3(x * relativePosition, y * relativePosition, z * relativePosition);
+          GameObject cell = Instantiate(cellPrefab, gameObject.transform, true) as GameObject;
+          cell.name = $"Cell ({x}, {y}, {z})";
+          cell.transform.position = position;
+          cell.transform.localScale = Vector3.one * CELL_SIZE;
+          cells[x + 1, y + 1, z + 1] = cell;
 
           // gameState.createCell(x, y, z);
         }
@@ -75,28 +91,21 @@ public class Cube : MonoBehaviour
   
   private void HandleWholeCubeRotation()
   {
-
-    Vector3 rotationToAdd = new Vector3(0, 0, 0);
-
     if (Input.GetKeyDown(KeyCode.LeftArrow))
     {
-      rotationToAdd = new Vector3(-90, 0, 0);
-    } 
+      iTween.RotateAdd(gameObject, Vector3.left * 90, ROTATION_TIME_SECONDS);
+    }
     else if (Input.GetKeyDown(KeyCode.RightArrow))
     {
-      rotationToAdd = new Vector3(90, 0, 0);
+      iTween.RotateAdd(gameObject, Vector3.right * 90, ROTATION_TIME_SECONDS);
     }
     else if (Input.GetKeyDown(KeyCode.UpArrow))
     {
-      rotationToAdd = new Vector3(0, 90, 0);
+      iTween.RotateAdd(gameObject, Vector3.up * 90, ROTATION_TIME_SECONDS);
     }
     else if (Input.GetKeyDown(KeyCode.DownArrow))
     {
-      rotationToAdd = new Vector3(0, -90, 0);
+      iTween.RotateAdd(gameObject, Vector3.down * 90, ROTATION_TIME_SECONDS);
     }
-
-    Rigidbody rigidBody = gameObject.GetComponent<Rigidbody>();
-    Quaternion deltaRotation = Quaternion.Euler(rotationToAdd);
-    rigidBody.MoveRotation(rigidBody.rotation * deltaRotation);
   }
 }
