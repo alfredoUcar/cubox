@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml;
 using Unity.VisualScripting;
@@ -43,12 +44,12 @@ public class Cube : MonoBehaviour
         {
           Vector3 position = new Vector3(x * relativePosition, y * relativePosition, z * relativePosition);
           GameObject cell = Instantiate(cellPrefab, gameObject.transform, true) as GameObject;
-          cell.name = $"Cell ({x}, {y}, {z})";
+          cell.name = $"Cell ({x+1}, {y+1}, {z+1})";
           cell.transform.position = position;
           cell.transform.localScale = Vector3.one * CELL_SIZE;
           cells[x + 1, y + 1, z + 1] = cell;
 
-          // gameState.createCell(x, y, z);
+          gameState.createCell(x+1, y+1, z+1);
         }
       }
 
@@ -68,17 +69,30 @@ public class Cube : MonoBehaviour
     bool isObjectClicked = Physics.Raycast(ray, out hit);
     if (!isObjectClicked)
     {
-        return;
+      return;
     }
 
     // Get transform component through the cell collider because first transform
     // detected by the raycast would belong to parent container.
-    if (!hit.collider.transform.name.StartsWith("Cell "))
+    var name = hit.collider.transform.name;
+    Regex regex = new Regex(@"Cell \((\d), (\d), (\d)\)");
+    Match match = regex.Match(name);
+    if (!match.Success)
+    {
+      return;
+    }
+
+    int x = int.Parse(match.Groups[1].Value);
+    int y = int.Parse(match.Groups[2].Value);
+    int z = int.Parse(match.Groups[3].Value);
+
+    if (!gameState.isCellAvailable(x, y, z)) 
     {
       return;
     }
 
     hit.collider.transform.GetComponent<Renderer>().material.color = gameState.getCurrentColor();
+    gameState.selectCell(x, y, z);
     gameState.endTurn();
     
   }
