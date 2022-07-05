@@ -1,14 +1,6 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Xml;
 using Unity.VisualScripting;
-using Unity.VisualScripting.Dependencies.NCalc;
 using UnityEngine;
-using UnityEngine.Assertions.Must;
 
 public class Cube : MonoBehaviour
 {
@@ -25,6 +17,7 @@ public class Cube : MonoBehaviour
   {
     InitializeCube();
     CreateCells();
+    gameState.calculateAdjacency();
   }
 
   private void InitializeCube()
@@ -36,11 +29,11 @@ public class Cube : MonoBehaviour
   public void CreateCells()
   {
     float relativePosition = RELATIVE_CELL_SIZE + RELATIVE_CELL_MARGIN;
-    for (int x = -1; x < GameState.dimensions - 1; x++)
+    for (int x = -1; x < GameState.CUBE_SIZE - 1; x++)
     {
-      for (int y = -1; y < GameState.dimensions - 1; y++)
+      for (int y = -1; y < GameState.CUBE_SIZE - 1; y++)
       {
-        for (int z = -1; z < GameState.dimensions -1; z++)
+        for (int z = -1; z < GameState.CUBE_SIZE -1; z++)
         {
           Vector3 position = new Vector3(x * relativePosition, y * relativePosition, z * relativePosition);
           GameObject cell = Instantiate(cellPrefab, gameObject.transform, true) as GameObject;
@@ -93,6 +86,7 @@ public class Cube : MonoBehaviour
 
     hit.collider.transform.GetComponent<Renderer>().material.color = gameState.getCurrentColor();
     gameState.selectCell(x, y, z);
+    gameState.isLineCompleteAt(x, y, z);
     gameState.endTurn();
     
   }
