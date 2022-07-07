@@ -15,9 +15,9 @@ public class Cube : MonoBehaviour
 
   void Start()
   {
-    InitializeCube();
-    CreateCells();
-    gameState.calculateAdjacency();
+    // InitializeCube();
+    // CreateCells();
+    // gameState.calculateAdjacency();
   }
 
   private void InitializeCube()
@@ -79,7 +79,7 @@ public class Cube : MonoBehaviour
     int y = int.Parse(match.Groups[2].Value);
     int z = int.Parse(match.Groups[3].Value);
 
-    if (!gameState.isCellAvailable(x, y, z)) 
+    if (!gameState.isCellAvailable(x, y, z))
     {
       return;
     }
@@ -88,15 +88,15 @@ public class Cube : MonoBehaviour
     gameState.selectCell(x, y, z);
     gameState.isLineCompleteAt(x, y, z);
     gameState.endTurn();
-    
+
   }
 
   void Update()
     {
-        CheckClickOnCell();   
+        CheckClickOnCell();
         HandleWholeCubeRotation();
     }
-  
+
   private void HandleWholeCubeRotation()
   {
     if (Input.GetKeyDown(KeyCode.LeftArrow))
